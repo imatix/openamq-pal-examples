@@ -1,0 +1,14 @@
+<?xml?>
+<!--
+    Sends messages at full speed to the amq.direct exchange with routing
+    key 'test'.
+-->
+<pal script = "amq_pal_gen" >
+    <session>
+        <basic_content message_id = "test" />
+        <repeat>
+            <basic_publish exchange = "amq.direct" routing_key = "test" />
+        </repeat>
+    </session>
+</pal>
+
