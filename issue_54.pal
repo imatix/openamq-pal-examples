@@ -1,0 +1,10 @@
+<?xml?>
+<!--
+    Checks that attempting to declare a durable queue is not
+    allowed.  Test case for http://www.openamq.org/issue:54.
+-->
+<pal script = "amq_pal_gen" >
+    <session>
+        <queue_declare queue = "test-queue" durable = "1" />
+    </session>
+</pal>
