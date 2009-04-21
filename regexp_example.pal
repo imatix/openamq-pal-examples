@@ -1,0 +1,33 @@
+<?xml?>
+<!-- Demonstrates regexp routing via amq.regexp exchange -->
+<pal script = "amq_pal_gen" >
+    <session exchange = "amq.regexp" mandatory = "1">
+        <queue_declare queue = "regexp.matches" />
+        <queue_bind routing_key = "str.*ing" />
+        <basic_consume />
+
+        <basic_content message_id = "Should match" />
+        <basic_publish routing_key = "this is a string" />
+        <basic_publish routing_key = "strange things happen" />
+
+        <basic_content message_id = "Should not match" />
+        <basic_publish routing_key = "String Theory" />
+        <basic_publish routing_key = "" />
+
+        <repeat>
+            <wait timeout = "1000" />
+            <basic_arrived>
+                <echo>Arrived: $message_id</echo>
+                <inc name = "messages" />
+            </basic_arrived>
+            <basic_returned>
+                <echo>Returned: $message_id</echo>
+                <inc name = "messages" />
+            </basic_returned>
+            <if name = "messages" value = "4">
+                <break />
+            </if>
+        </repeat>
+    </session>
+</pal>
+
