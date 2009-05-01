@@ -1,0 +1,30 @@
+<?xml?>
+<!-- Test case for http://www.openamq.org/issue:58 -->
+<pal script = "amq_pal_gen" >
+    <session>
+        <queue_declare queue = "issue-58" />
+        <basic_consume />
+
+        <!-- Test deliver via default exchange -->
+        <basic_content message_id = "deliver" />
+        <basic_publish routing_key = "issue-58" mandatory = "1" />
+        <invoke macro = "wait for message" />
+
+        <!-- Test return via default exchange -->
+        <basic_content message_id = "return" />
+        <basic_publish routing_key = "no such routing key" mandatory = "1" />
+        <invoke macro = "wait for message" />
+    </session>
+
+    <macro name = "wait for message">
+        <!-- Wait with zero timeout -->
+        <wait />
+        <basic_arrived>
+            <echo>'$message_id' was delivered</echo>
+        </basic_arrived>
+        <basic_returned>
+            <echo>'$message_id' was returned</echo>
+        </basic_returned>
+    </macro>
+</pal>
+
