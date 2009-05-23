@@ -1,0 +1,78 @@
+<?xml?>
+<!--
+    Test case for message acknowledgments.
+    This script publishes two messages, receives the first and then
+    pushes it back to the queue, and then receives it again.  If
+    acknowledgements are not implemented, or are disabled, the test
+    will fail. See http://www.openamq.org/issue:55.
+-->
+<pal script = "amq_pal_gen" >
+    <session queue = "issue-55">
+        <!-- Create a shared queue and send two messages to it -->
+        <queue_declare />
+        <queue_purge />
+        <basic_content message_id = "1" />
+        <basic_publish routing_key = "$queue" />
+        <basic_content message_id = "2" />
+        <basic_publish routing_key = "$queue" />
+
+        <!-- Give messages time to land in queue, check they are there -->
+        <wait timeout = "100" />
+        <queue_declare />
+        <assert name = "message_count" value = "2">Failed (1): queue is not working at all</assert>
+
+        <!-- Create consumer, we expect to get exactly one message -->
+        <basic_consume no_acks = "0" />
+        <wait timeout = "1000" />
+        <basic_arrived>
+            <echo>Received message id=$message_id delivery_tag=$delivery_tag</echo>
+            <set name = "message_id" value = "$message_id" />
+            <assert name = "message_id" value = "1">Failed (2): wrong message $message_id arrived</assert>
+        </basic_arrived>
+        <empty>
+            <abort>Failed (3): no message arrived</abort>
+        </empty>
+        <wait timeout = "100" />
+        <basic_arrived>
+            <echo>Received message id=$message_id delivery_tag=$delivery_tag</echo>
+            <abort>Failed (4): message acknowledgment is not working</abort>
+        </basic_arrived>
+
+        <!-- Cancel consumer, we expect unack'd message to go back on queue -->
+        <basic_cancel consumer_tag = "$consumer_tag" />
+
+        <!-- Give message time to land in queue, check it's back there -->
+        <wait timeout = "100" />
+        <queue_declare />
+        <assert name = "message_count" value = "2">Failed (5): cancel did not requeue message</assert>
+
+        <!-- Create consumer, expect to get same message again -->
+        <basic_consume no_acks = "0" />
+        <wait timeout = "1000" />
+        <basic_arrived>
+            <echo>Received message id=$message_id delivery_tag=$delivery_tag</echo>
+            <set name = "message_id" value = "$message_id" />
+            <assert name = "message_id" value = "1">Failed (6): wrong message $message_id arrived</assert>
+        </basic_arrived>
+        <empty>
+            <abort>Failed (7): no message arrived</abort>
+        </empty>
+        <wait timeout = "100" />
+        <basic_arrived>
+            <echo>Received message id=$message_id delivery_tag=$delivery_tag</echo>
+            <abort>Failed (8): message acknowledgment is not working</abort>
+        </basic_arrived>
+
+        <!-- Acknowledge message, and expect second -->
+        <basic_ack multiple = "1" />
+        <wait timeout = "100" />
+        <basic_arrived>
+            <echo>Received message id=$message_id delivery_tag=$delivery_tag</echo>
+            <set name = "message_id" value = "$message_id" />
+            <assert name = "message_id" value = "2">Failed (9): wrong message $message_id arrived</assert>
+        </basic_arrived>
+        <empty>
+            <abort>Failed (10): no message arrived</abort>
+        </empty>
+    </session>
+</pal>

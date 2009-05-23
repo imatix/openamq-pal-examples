@@ -1,3 +1,23 @@
 *.c
 *.o
+issue_55
+blast
+dj_pub
+dj_sub
+duptag
+exchange404
+failover
+issue_54
+noop
+pub
+queue_limit
+regexp_example
+send1
+stress
+sub
+test-issue-58
+test_routing
+topic_publish
+topic_subscribe
+wait1
 
