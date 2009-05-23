@@ -20,4 +20,12 @@ test_routing
 topic_publish
 topic_subscribe
 wait1
+blaster_client
+blaster_server
+echo_client
+echo_server
+exchange
+headers_publish
+headers_subscribe
+unbind
 
