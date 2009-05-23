@@ -1,6 +1,5 @@
 *.c
 *.o
-issue_55
 blast
 dj_pub
 dj_sub
@@ -8,6 +7,8 @@ duptag
 exchange404
 failover
 issue_54
+issue_55
+issue_65
 noop
 pub
 queue_limit

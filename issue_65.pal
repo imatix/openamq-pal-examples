@@ -1,0 +1,12 @@
+<?xml?>
+<!--
+    Test case for polling.  This just tries the poll call,
+    the test should complete without an error and without
+    waiting.
+    See http://www.openamq.org/issue:65.
+-->
+<pal script = "amq_pal_gen" >
+    <session>
+        <wait timeout = "-1" />
+    </session>
+</pal>

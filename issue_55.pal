@@ -61,6 +61,7 @@
         <basic_arrived>
             <echo>Received message id=$message_id delivery_tag=$delivery_tag</echo>
             <abort>Failed (8): message acknowledgment is not working</abort>
+            <assert name = "redelivered" value = "1">Failed (9): not marked as redelivery</assert>
         </basic_arrived>
 
         <!-- Acknowledge message, and expect second -->
@@ -69,10 +70,12 @@
         <basic_arrived>
             <echo>Received message id=$message_id delivery_tag=$delivery_tag</echo>
             <set name = "message_id" value = "$message_id" />
-            <assert name = "message_id" value = "2">Failed (9): wrong message $message_id arrived</assert>
+            <assert name = "message_id" value = "2">Failed (10): wrong message $message_id arrived</assert>
+            <assert name = "redelivered" value = "0">Failed (11): marked as redelivery, should not be</assert>
+            <basic_ack multiple = "1" />
         </basic_arrived>
         <empty>
-            <abort>Failed (10): no message arrived</abort>
+            <abort>Failed (12): no message arrived</abort>
         </empty>
     </session>
 </pal>
