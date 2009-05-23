@@ -1,0 +1,78 @@
+<?xml?>
+<pal script = "amq_pal_gen">
+    This script publishes messages to the "echo server".  It waits for a
+    response from the "echo server" before publishing the next message.
+
+    Use it in combination with echo_server.pal to measure server latency.
+
+    <!-- Number of messages to send -->
+    <set name = "count"          value = "10000" cmdline = "C" />
+
+    <!-- Size of each message body -->
+    <set name = "size"           value = "128"   cmdline = "S" />
+
+    <!-- Log number of messages sent/received every N messages,
+         0=disable -->
+    <set name = "log_interval"   value = "0"     cmdline = "L" />
+
+    <set name = "received"       value = "0" />
+    <set name = "total_received" value = "0" />
+    <set name = "sent"           value = "0" />
+    <set name = "total_sent"     value = "0" />
+
+    <echo>I: Sending $count messages of $size bytes ...</echo>
+    <session exchange = "amq.direct">
+        <queue_declare />
+        <queue_bind    queue = "$queue" routing_key = "$queue" />
+        <basic_consume queue = "$queue" auto_ack    = "1"      />
+
+        <repeat times = "$count" counter = "id">
+            <basic_content fill       = "random"  size     = "$size" 
+                           message_id = "msg-$id" reply_to = "$queue" />
+            <basic_publish routing_key = "echo server" mandatory = "1" />
+            <wait timeout = "1" />
+            <inc name = "total_sent" />
+            <if  name = "log_interval" test = "ne" value = "0" >
+                <inc name = "sent"       />
+                <if  name = "sent" value = "log_interval" >
+                    <echo>I: Sent $total_sent messages</echo>
+                    <set name = "sent" value = "0" />
+                </if>
+            </if>
+            <basic_arrived>
+                <inc name = "total_received" />
+                <if  name = "log_interval" test = "ne" value = "0" >
+                    <inc name = "received"       />
+                    <if  name = "received" value = "log_interval" >
+                        <echo>I: Received $total_received messages</echo>
+                        <set name = "received" value = "0" />
+                    </if>
+                </if>
+            </basic_arrived>
+        </repeat>
+        <echo>I: Sent all messages</echo>
+        <if name = "total_received" value = "count" >
+            <echo>I: Received all messages</echo>
+            <exit />
+        </if>
+        <echo>I: Received $total_received messages, waiting for remainder</echo>
+        <repeat>
+            <wait />
+            <basic_arrived>
+                <inc name = "total_received" />
+                <if  name = "log_interval" test = "ne" value = "0" >
+                    <inc name = "received"       />
+                    <if  name = "received" value = "log_interval" >
+                        <echo>I: Received $total_received messages</echo>
+                        <set name = "received" value = "0" />
+                    </if>
+                </if>
+                <if  name = "total_received" value = "count" >
+                    <echo>I: Received all messages</echo>
+                    <exit />
+                </if>
+            </basic_arrived>
+        </repeat>
+    </session>
+</pal>
+

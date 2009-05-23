@@ -1,0 +1,8 @@
+<?xml?>
+<pal script = "amq_pal_gen" >
+    <!-- Just declares an exhange -->
+    <session>
+        <exchange_declare exchange = "ping" type = "fanout" />
+    </session>
+</pal>
+

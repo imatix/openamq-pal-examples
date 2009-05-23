@@ -1,0 +1,10 @@
+<?xml?>
+<pal script = "amq_pal_gen" >
+    <!-- Does a bind and then an unbind -->
+    <session>
+        <queue_declare exclusive = "0" />
+        <queue_bind exchange = "amq.topic" routing_key = "*.*" />
+        <queue_unbind exchange = "amq.topic" routing_key = "*.*" />
+        <wait timeout = "1000" />
+    </session>
+</pal>
